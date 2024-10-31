@@ -18,11 +18,6 @@ def generate_haiku(usermessage: str, language: str ="french"):
     """Generate haiku based on user message and style/language."""
     return f"{usermessage} in {language} language"
 
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    welcome_text = ("send /haiku followed by your theme.\n"
-                   "Example: /haiku day in zoo")
-    bot.reply_to(message, welcome_text)
     
 
 @bot.message_handler(commands=['haiku'])
