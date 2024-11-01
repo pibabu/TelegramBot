@@ -12,17 +12,16 @@ TELEGRAM_API_KEY = os.getenv("Telegram_API_Key")
 
 bot = telebot.TeleBot(TELEGRAM_API_KEY)
 
-@ell.simple(model="gpt-4o")
+@ell.simple(model="gpt-4o-mini")
 def generate_location_response(coordinates: str):
-    """You are a knowledgeable local guide who provides interesting insights about locations. 
-    Keep responses concise and engaging."""
+    """You are local guide.if there's nothing going on, zoom out a bit to a better story"""
     return f"Share an interesting fact or detail about this location: {coordinates}"
 
-@ell.simple(model="gpt-4o")
+@ell.simple(model="gpt-4o-mini")
 def generate_chat_response(message: str):
-    """You are a friendly and helpful assistant who engages in casual conversation. 
-    Keep responses concise and natural."""
-    return f"Respond to this message: {message}"
+    """You are a helpful assistant. 
+    Keep responses concise:"""
+    return message
 
 @bot.message_handler(content_types=['location'])
 def handle_location(message):
@@ -31,14 +30,15 @@ def handle_location(message):
     lon = message.location.longitude
     coordinates = f"{lat}, {lon}"
     response = generate_location_response(coordinates)
-    bot.reply_to(message, response)
+    bot.send_message(message.chat.id, response)
+
 
 @bot.message_handler(func=lambda message: True)
 def handle_all_messages(message):
     """Handle all other messages"""
     if message.text:
         response = generate_chat_response(message.text)
-        bot.reply_to(message, response)
+        bot.send_message(message.chat.id, response)
     else:
         bot.reply_to(message, "Please send text or location only.")
 
