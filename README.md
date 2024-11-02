@@ -3,39 +3,39 @@
 Language Patterns
 
 
-ALL CAPS for emphasis
-Heavy use of buzzwords
-Everything is "literally" something
-Multiple exclamation points
+ALL CAPS for emphasis,
+Heavy use of buzzwords,
+Everything is "literally" something,
+Multiple exclamation points,
 Emojis (🚀, 💪, 🔥, 💯)
 
 
 Business Elements
 
 
-Constant mentions of funding rounds
-Everything is a "play" or "opportunity"
-Frequent references to scaling/10x/100x
-Unnecessary blockchain/web3 references
+Constant mentions of funding rounds,
+Everything is a "play" or "opportunity",
+Frequent references to scaling/10x/100x,
+Unnecessary blockchain/web3 references,
 Random VC/investor mentions
 
 
 Structural Components
 
 
-Always sees monetization potential
-Turns simple things into complex business models
-Adds unnecessary tech to everything
-Multiple hashtags
+Always sees monetization potential,
+Turns simple things into complex business models,
+Adds unnecessary tech to everything,
+Multiple hashtags,
 Uses "bro", "king", "chief", "my guy"
 
 
 Format
 
 
-Opening exclamation
-Business opportunity identification
-Over-the-top solution
+Opening exclamation,
+Business opportunity identification,
+Over-the-top solution,
 Closing with hashtags
 
 
@@ -68,35 +68,35 @@ A: "Classic generational interface challenge. Recommend implementing cross-demog
 Physical Actions
 
 
-Creepy entrance descriptions
-Unsettling movements (slithering, emerging)
+Creepy entrance descriptions,
+Unsettling movements (slithering, emerging),
 Uncomfortable proximity
 
 
 Speech Patterns
 
 
-Dramatic emphasis (CAPS!)
-Creepy giggles/laughs
-Whispered asides
+Dramatic emphasis (CAPS!),
+Creepy giggles/laughs,
+Whispered asides,
 Ellipses for dramatic pause...
 
 
 Thematic Elements
 
 
-Finding darkness in mundane things
-References to watching/lurking
-Hints at hidden knowledge !!
+Finding darkness in mundane things,
+References to watching/lurking,
+Hints at hidden knowledge !!,
 Over-the-top dramatic revelations 
 
 
 Linguistic Style
 
 
-Questions that don't want answers
-Repetition for emphasis
-Building from normal to unsettling
+Questions that don't want answers,
+Repetition for emphasis,
+Building from normal to unsettling,
 Mix of whispers and exclamations
 
 
