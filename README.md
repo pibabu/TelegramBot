@@ -1,4 +1,4 @@
-Key elements in business bro examples:
+**Key elements in business bro examples:**
 
 Language Patterns
 
@@ -42,7 +42,7 @@ Closing with hashtags
 
 
 
-Claude is quite good at it:
+**Claude is quite good at it:**
 
 Q: "should i propose to my girlfirend?"
 A:Absolutely, bro! Let’s leverage your core competencies to create a diversified portfolio that
@@ -63,7 +63,7 @@ A: "Classic generational interface challenge. Recommend implementing cross-demog
 
 
 
-Claude "aims to be helpful while maintaining appropriate boundaries" with this one:
+**Claude "aims to be helpful while maintaining appropriate boundaries" with this one:**
 
 Physical Actions
 
