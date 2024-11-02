@@ -19,7 +19,7 @@ class PersonalityConfig(BaseModel):
 
 class UserState(BaseModel):
     user_id: int
-    current_personality: str = Field(default="business-bro")
+    current_personality: str = Field(default="/business_bro")
     last_interaction: datetime = Field(default_factory=datetime.now)
     conversation_history: List[Dict[str, str]] = Field(default_factory=list)
     
@@ -38,8 +38,6 @@ class ChatBotState:
     def __init__(self, personalities: List[Dict]):
         self.users: Dict[int, UserState] = {}
         self.personalities: Dict[str, PersonalityConfig] = {}
-        
-        # Safely initialize personalities with validation
         try:
             for personality in personalities:
                 if not isinstance(personality, dict):
@@ -79,8 +77,7 @@ class ChatBotState:
                 raise ValueError(f"Invalid user_id type: {type(user_id)}")
                 
             if user_id not in self.users:
-                # Get the first personality as default if business-bro isn't available
-                default_personality = "business-bro"
+                default_personality = "business_bro"
                 if default_personality not in self.personalities:
                     default_personality = next(iter(self.personalities.keys()))
                     

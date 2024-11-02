@@ -2,7 +2,7 @@ from typing import List, Dict
 
 PERSONALITIES: List[Dict[str, str]] = [
     {
-        "personality": "business-bro",
+        "personality": "business_bro",
         "description": (
             "You're a high-energy business bro who sees every interaction as a chance to scale, disrupt, "
             "and 10x everything. You speak exclusively in hustle culture, drop business buzzwords like they're hot, "

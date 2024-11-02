@@ -15,7 +15,9 @@ class TelegramBot:
         self.bot = telebot.TeleBot(TELEGRAM_API_KEY)
         self.llm = ChatOpenAI(temperature=0.7)
         self.state = ChatBotState(PERSONALITIES)
+       # self.user_id = None 
         self.setup_handlers()
+        
         
     def generate_chat_response(self, user_id: int, message: str) -> str:
         user_state = self.state.get_user_state(user_id)
@@ -27,7 +29,7 @@ class TelegramBot:
         system_prompt = (
             f"{personality.description}\n"
             f"{personality.format_examples()}\n"
-            "Respond to the user's message in this style."
+            "Respond to the user's message in this style. be a helpfull assistant"
         )
         
         messages = [
@@ -47,7 +49,7 @@ class TelegramBot:
             personality_data = self.state.get_personality(personality)
             response = f"Switching to {personality} mode!\n{personality_data.description}"
         else:
-            response = "Sorry, I don't know that personality!"
+            response = """type /sad, /business_bro or /creepy"""
         
         self.bot.reply_to(message, response)
     
@@ -60,7 +62,7 @@ class TelegramBot:
             self.bot.reply_to(message, "Please send text only.")
     
     def setup_handlers(self):
-        self.bot.message_handler(commands=['business-bro', 'sad', 'creepy'])(
+        self.bot.message_handler(commands=['business_bro', 'sad', 'creepy', 'start', 'settings'])(
             self.handle_personality_command
         )
         self.bot.message_handler(func=lambda message: True)(
@@ -69,6 +71,8 @@ class TelegramBot:
     
     def run(self):
         print("Bot is running...")
+        # if self.user_id:  
+        #     self.bot.send_message(self.user_id, text='Bot is up and running!') #erste message in telegram settings speichern
         self.bot.infinity_polling()
 
 if __name__ == "__main__":

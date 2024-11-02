@@ -21,7 +21,7 @@ class OutputModel(BaseModel):
     assistant_answer: str = Field(description="your coordination channel to help user create perfect few-shot-prompt")
     example_questions: list[str] = Field(description="""three q and a examples with creative and short llm answers. ONLY
                                          fill out """)
-    keep_state: bool = Field(description="""only set to False if user SAYS its good""") 
+    keep_state: bool = Field(description="""only set to False if user SAYS its good""") #problem
 
 
 @ell.complex(model='gpt-4o-mini', response_format=OutputModel)
