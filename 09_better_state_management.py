@@ -15,10 +15,9 @@ class TelegramBot:
         self.bot = telebot.TeleBot(TELEGRAM_API_KEY)
         self.llm = ChatOpenAI(temperature=0.7)
         self.state = ChatBotState(PERSONALITIES)
-       # self.user_id = None 
+        self.max_history_length = 7
         self.setup_handlers()
-        
-        
+    
     def generate_chat_response(self, user_id: int, message: str) -> str:
         user_state = self.state.get_user_state(user_id)
         personality = self.state.get_personality(user_state.current_personality)
@@ -26,19 +25,31 @@ class TelegramBot:
         if not personality:
             return "Personality not found!"
         
+        # System message is always first, never gets cut
         system_prompt = (
             f"{personality.description}\n"
             f"{personality.format_examples()}\n"
-            "Respond to the user's message in this style. be a helpfull assistant"
+            "Respond to the user's message in this style while maintaining context of the conversation. "
+            "Be a helpful assistant."
         )
         
-        messages = [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=message)
-        ]
+        messages = []
+        # system prompt nur einmal mitsenden!
+        messages.append(SystemMessage(content=system_prompt))
         
+       
+        history = user_state.conversation_history[-self.max_history_length:] 
+        for exchange in history:
+            messages.extend([
+                HumanMessage(content=exchange["message"]),
+                HumanMessage(content=exchange["response"])
+            ])
+            
+        messages.append(HumanMessage(content=message))
+
         response = self.llm.invoke(messages)
         user_state.add_to_history(message, response.content)
+        
         return response.content
     
     def handle_personality_command(self, message):
