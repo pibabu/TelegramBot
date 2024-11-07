@@ -1,0 +1,19 @@
+write a full email out of following fragments:
+
+<email>
+Dear {{ recipient }},
+
+here is your personality/tone you should adapt to:
+{% set personality = PERSONALITIES[style] %}
+{{ personality.description }}
+
+Here are some example responses in the {{ style }} tone:
+{% for example in personality.examples %}
+User: {{ example.user }}
+Bot: {{ example.bot }}
+
+{% endfor %}
+
+Best regards,
+{{ name }}
+</email>
