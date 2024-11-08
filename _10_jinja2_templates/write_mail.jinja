@@ -1,13 +1,13 @@
 write a full, concise email out of following fragments:
 
 <email>
-Dear {{ recipient }},
+Dear {{ name_recipient }},
 
 here is your personality/tone you should adapt to:
 {% set personality = PERSONALITIES[style] %}
 {{ personality.description }}
 
-Here are some example responses in the {{ style }} tone:
+Here are some example responses in {{ style }} tone:
 {% for example in personality.examples %}
 User: {{ example.user }}
 Bot: {{ example.bot }}

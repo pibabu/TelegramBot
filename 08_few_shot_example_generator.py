@@ -36,7 +36,7 @@ def create_few_shot_prompt(text: str):
     - Each example should clearly demonstrate the chosen personality
     - Examples should be diverse but consistent in style
     - Pay attention to user feedback and adjust accordingly
-    - Only set <keep_state>=False when user explicitly approves examples
+    - Only set <keep_state>=False when user !! explicitly !! approves examples
 
     Example interaction flow:
 
@@ -58,7 +58,7 @@ def create_few_shot_prompt(text: str):
     ]
     keep_state: true
 
-    user: "perfect!lets keep them"
+    user: "perfect! lets keep them"
     assistant_answer: "alrighty, i save these exapmes. see you later"
     example_questions: [previous examples repeated]
     keep_state: false
