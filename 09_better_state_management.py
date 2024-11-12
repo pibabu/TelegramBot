@@ -55,7 +55,7 @@ class TelegramBot:
         return response.content
 
     def handle_personality_command(self, message):
-        personality = message.text[1:]  # Remove the '/' from the command
+        personality = message.text[1:]
         user_id = message.from_user.id
 
         if self.state.update_user_personality(user_id, personality):

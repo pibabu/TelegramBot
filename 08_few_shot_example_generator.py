@@ -23,7 +23,7 @@ class OutputModel(BaseModel):
     )
 
 
-@ell.complex(model="gpt-4o-mini", response_format=OutputModel)  ####add chat hirstory
+@ell.complex(model="gpt-4o-mini", response_format=OutputModel)  ####add chat history
 def create_few_shot_prompt(text: str):
     """Your job: Help users create and refine 3 few-shot examples for their chosen personality style.
 
