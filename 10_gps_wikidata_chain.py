@@ -5,7 +5,6 @@ import telebot
 import ell
 from ell import Message
 
-# Load environment variables
 load_dotenv()
 TELEGRAM_API_KEY = os.getenv("TELEGRAM_API_KEY")
 if not TELEGRAM_API_KEY:
@@ -16,10 +15,14 @@ ell.init(store="./logdir", autocommit=True, verbose=True)
 
 
 # SPARQL query generator
-@ell.simple(model="gpt-4o-mini", n=3)
+@ell.simple(
+    model="gpt-4o-mini", n=3
+)  # This means that when you call an ell.simple language model program with n greater than one, instead of returning a string, it returns a list of strings.
 def generate_sparql_queries(coordinates: list, message_history: list):
     """
-    Generate three SPARQL queries based on user coordinates and chat history.
+    You are an expert SPARQL-query generator for wikidata. You output three SPARQL queries based on user (intent, coordinates).
+    think deeply about user objective and wikidata schema before giving answer.
+    user coordinates and chat history:
     """
     return coordinates, message_history
 
@@ -38,14 +41,13 @@ def wikidata_api_calls(queries: list) -> list:
 
 # Response generator
 @ell.simple(model="gpt-4o-mini")
-def generate_final_response(context: list) -> str:
+def generate_final_response(context: list, message_history: list) -> str:
     """
-    Generate a final response from Wikidata context data.
+    Generate a final response from Wikidata context data. evaluate context
     """
-    return "\n".join(context)
+    return "\n".join(context), message_history
 
 
-# Pipeline function
 def pipeline(*funcs):
     def inner(data):
         result = data
@@ -57,9 +59,20 @@ def pipeline(*funcs):
 
 
 wikidata_pipeline = pipeline(
-    generate_sparql_queries,
-    wikidata_api_calls,
-    generate_final_response,
+    lambda x: (
+        generate_sparql_queries(x[0], x[1]),
+        x[1],
+    ),
+    # x is Tuple[List[float], List[Message]]
+    # returns(queries, message_history)
+    lambda x: (
+        wikidata_api_calls(x[0]),
+        x[1],
+    ),
+    # x is now List[str] (the SPARQL queries)
+    # Returns List[str] (API results) and untouched history
+    lambda x: generate_final_response(x[0], x[1]),
+    # Returns str (final message)
 )
 
 
@@ -68,7 +81,7 @@ wikidata_pipeline = pipeline(
 def handle_location(message):
     lat, lon = message.location.latitude, message.location.longitude
     coordinates = [lat, lon]
-    response = wikidata_pipeline(coordinates)
+    response = wikidata_pipeline(coordinates, message_history)
     bot.send_message(message.chat.id, response)
 
 
@@ -85,27 +98,6 @@ if __name__ == "__main__":
     print("Bot is running...")
     bot.infinity_polling()
 
-
-@bot.message_handler(content_types=["location"])
-def handle_location(message):
-    """Handle location messages"""
-    lat = message.location.latitude
-    lon = message.location.longitude
-    coordinates = f"{lat}, {lon}"
-
-    response = wikidata_pipeline(coordinates)
-
-    for query in response:
-        bot.send_message(message.chat.id, query)
-
-
-@ell.complex(model="gpt-4o-mini", temperature=0.7)
-def chat_bot(message_history: List[Message]) -> List[Message]:
-    return [
-        ell.system("You are a friendly chatbot. Engage in casual conversation."),
-    ] + message_history
-
-
 message_history = []
 while True:
     user_input = input("You: ")
@@ -113,19 +105,3 @@ while True:
     response = chat_bot(message_history)
     print("Bot:", response.text)
     message_history.append(response)
-
-
-@bot.message_handler(func=lambda message: True)
-def handle_all_messages(message):
-    """Handle all other messages."""
-    if message.text:
-        response = chatbot(message.text)
-        for query in response:
-            bot.send_message(message.chat.id, query)
-    else:
-        bot.reply_to(message, "Please send text or location only.")
-
-
-if __name__ == "__main__":
-    print("Bot is running...")
-    bot.infinity_polling()
