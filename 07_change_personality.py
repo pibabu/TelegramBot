@@ -15,7 +15,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 bot = telebot.TeleBot(TELEGRAM_API_KEY)
 
 
-llm = ChatOpenAI(temperature=0.7)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 
 # Global variable to store current personality for each user
 user_personalities: Dict[int, str] = {}
