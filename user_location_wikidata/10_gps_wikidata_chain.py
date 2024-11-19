@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from typing import List
+from typing import List, Tuple
 import telebot
 import ell
 from ell import Message, ContentBlock
@@ -66,9 +66,20 @@ redis_manager = RedisMessageManager(REDIS_URL)
 
 
 @ell.simple(model="gpt-4o-mini", temperature=0.7)
-def chat_bot(user_prompt: str, message_history: List[Message]) -> str:
+def chat_bot(user_prompt: str, message_history: List[Tuple[str, str]]) -> str:
     """Chatbot with context awareness"""
+    return [
+        ell.system(f"""
+                {user_prompt}.  
+                Your goal is to come up with a response to a chat. Only"""),
+        ell.user(format_message_history(message_history)),
+    ]
+
     return f"{message_history}\n{user_prompt}"
+
+
+def format_message_history(message_history: List[Tuple[str, str]]) -> str:
+    return "\n".join([f"{name}: {message}" for name, message in message_history])
 
 
 @ell.simple(model="gpt-4o-mini", n=3)
@@ -137,42 +148,33 @@ def handle_text(message):
     """Handle text messages"""
     chat_id = message.chat.id
 
-    def extract_text(content_blocks):
-        """
-        Recursively extract text from ContentBlock objects.
-        """
-        if isinstance(content_blocks, list):
-            return "\n".join(extract_text(block) for block in content_blocks)
-        if isinstance(content_blocks, ContentBlock):
-            if isinstance(content_blocks.text, list):
-                return extract_text(content_blocks.text)
-            return content_blocks.text or ""
-        return ""
+    def extract_text(text_content):
+        user_message = ell.user(text_content)
+        redis_manager.add_message(
+            chat_id, user_message
+        )  ##hier ist das problem?: user_message
 
-    if message.text or message.content:
-        # Extract text from message.content if nested
-        text_content = message.text or extract_text(message.content)
+        # Get updated history
+        history = redis_manager.get_history(chat_id)
 
-        if text_content:
-            # Store user message
-            user_message = ell.user(text_content)
-            redis_manager.add_message(chat_id, user_message)
+        # Generate response
+        response = chat_bot(text_content, history)
 
-            # Get updated history
-            history = redis_manager.get_history(chat_id)
+        # Store bot response
+        bot_response = ell.system(response)
+        redis_manager.add_message(chat_id, bot_response)
 
-            # Generate response
-            response = chat_bot(text_content, history)
+        bot.send_message(chat_id, response)
 
-            # Store bot response
-            bot_response = ell.system(response)
-            redis_manager.add_message(chat_id, bot_response)
-
-            bot.send_message(chat_id, response)
-        else:
-            bot.reply_to(message, "Could not process your message.")
+    if message.text:
+        extract_text(message.text)  # Call the extract_text function with message.text
     else:
         bot.reply_to(message, "Please send text or location only.")
+
+    #     else:
+    #         bot.reply_to(message, "Could not process your message.")
+    # else:
+    #     bot.reply_to(message, "Please send text or location only.")
 
 
 @bot.message_handler(commands=["clear"])
