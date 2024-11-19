@@ -1,3 +1,4 @@
 .env
 *logdir*
 __pycache__
+*chat_history*

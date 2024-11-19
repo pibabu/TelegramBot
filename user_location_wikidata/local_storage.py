@@ -97,6 +97,9 @@ def chat_bot(history: List[Message], input_message: Message) -> Message:
     ]
 
 
+print("Message Object:", {Message})
+
+
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
     """Handle incoming text messages"""
@@ -119,7 +122,7 @@ def handle_text(message):
     chat_manager.add_message(chat_id, assistant_response)
 
     # Send response to user
-    bot.send_message(message.chat.id, assistant_response.text)
+    bot.send_message(message.chat.id, assistant_response.text)  #####send_messsage statt
 
 
 @bot.message_handler(commands=["clear"])
