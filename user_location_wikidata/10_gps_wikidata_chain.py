@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from typing import List
+from typing import List, Tuple
 import telebot
 import ell
 from ell import Message, ContentBlock
@@ -66,9 +66,20 @@ redis_manager = RedisMessageManager(REDIS_URL)
 
 
 @ell.simple(model="gpt-4o-mini", temperature=0.7)
-def chat_bot(user_prompt: str, message_history: List[Message]) -> str:
+def chat_bot(user_prompt: str, message_history: List[Tuple[str, str]]) -> str:
     """Chatbot with context awareness"""
+    return [
+        ell.system(f"""
+                {user_prompt}.  
+                Your goal is to come up with a response to a chat. Only"""),
+        ell.user(format_message_history(message_history)),
+    ]
+
     return f"{message_history}\n{user_prompt}"
+
+
+def format_message_history(message_history: List[Tuple[str, str]]) -> str:
+    return "\n".join([f"{name}: {message}" for name, message in message_history])
 
 
 @ell.simple(model="gpt-4o-mini", n=3)
