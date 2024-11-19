@@ -49,3 +49,13 @@ def handle_all_messages(message):
 if __name__ == "__main__":
     print("Bot is running...")
     bot.infinity_polling()
+
+
+# while True:
+#     user_input = input("You: ")
+#     message_history.append(ell.user(user_input))
+#     response = chat_bot(message_history)
+#     print("Bot:", response.text)
+#     message_history.append(response)
+
+#     break

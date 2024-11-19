@@ -11,7 +11,18 @@ if not TELEGRAM_API_KEY:
     raise EnvironmentError("TELEGRAM_API_KEY is missing. Please check your .env file.")
 
 bot = telebot.TeleBot(TELEGRAM_API_KEY)
+
 ell.init(store="./logdir", autocommit=True, verbose=True)
+
+
+@ell.simple(model="gpt-4o-mini", temperature=0.7)
+def chat_bot(user_prompt, message_history: List[Message]) -> List[Message]:
+    """unhelpfull assistant"""
+    # return user_prompt + message_history
+    return f"{message_history}\n{user_prompt}"
+
+
+message_history = []
 
 
 # SPARQL query generator
@@ -82,20 +93,34 @@ wikidata_pipeline = pipeline(
 def handle_location(message):
     lat, lon = message.location.latitude, message.location.longitude
     coordinates = [lat, lon]
-    response = wikidata_pipeline(coordinates, message_history)
+    response = wikidata_pipeline(coordinates)
     bot.send_message(message.chat.id, response)
 
 
-# Conversational chatbot
+@bot.message_handler(func=lambda message: True)
+def handle_text(message):
+    chat_id = message.chat.id
+    message_history = []
 
-message_history = []
+    if message.text:
+        user_message = ell.user(message.text)
+        message_history.append(user_message)
 
+        response = chat_bot(message.text, message_history)
+        bot_response = ell.system(response)
+        message_history.append(bot_response)
 
-@ell.complex(model="gpt-4o-mini", temperature=0.7)
-def chat_bot(message_history: List[Message]) -> List[Message]:
-    return [
-        ell.system("You are a friendly chatbot. Engage in casual conversation."),
-    ] + message_history
+        bot.send_message(chat_id, response)
+
+        # while True:
+    # user_input = input("You: ")
+    # message_history.append(ell.user(user_input))
+    # response = chat_bot(message_history)
+    # print("Bot:", response.text)
+    # message_history.append(response)
+
+    else:
+        bot.reply_to(message, "Please send text or location only.")
 
 
 # Main entry point
@@ -105,12 +130,3 @@ if __name__ == "__main__":
         bot.infinity_polling()
     except Exception as e:
         print(f"Error occurred: {e}")
-
-
-# message_history = []
-# while True:
-#     user_input = input("You: ")
-#     message_history.append(ell.user(user_input))
-#     response = chat_bot(message_history)
-#     print("Bot:", response.text)
-#     message_history.append(response)
