@@ -54,7 +54,7 @@ class RedisMessageManager:
         key = self._get_key(chat_id)
         messages = self.redis.lrange(key, 0, -1)
 
-        # Convert stored messages back to Message objects
+        # Convert stored messages back to Message objects               #####check es!
         return [
             Message(role=json.loads(msg)["role"], content=json.loads(msg)["content"])
             for msg in reversed(messages)  # Reverse to get chronological order
@@ -80,67 +80,6 @@ def chat_bot(user_prompt: str, message_history: List[Tuple[str, str]]) -> str:
 
 def format_message_history(message_history: List[Tuple[str, str]]) -> str:
     return "\n".join([f"{name}: {message}" for name, message in message_history])
-
-
-@ell.simple(model="gpt-4o-mini", n=3)
-def generate_sparql_queries(coordinates: list, message_history: list):
-    """
-    You are an expert SPARQL-query generator for wikidata. You output three SPARQL queries based on user (intent, coordinates).
-    think deeply about user objective and wikidata schema before giving answer.
-    user coordinates and chat history:
-    """
-    return coordinates, message_history
-
-
-def wikidata_api_calls(queries: list) -> list:
-    """Mock Wikidata API calls"""
-    return [f"Mock response for query: {query}" for query in queries]
-
-
-@ell.simple(model="gpt-4o-mini")
-def generate_final_response(context: list, message_history: list) -> str:
-    """Generate final response using context and history"""
-    return "\n".join(context)
-
-
-def pipeline(*funcs):
-    def inner(data):
-        result = data
-        for func in funcs:
-            result = func(result)
-        return result
-
-    return inner
-
-
-wikidata_pipeline = pipeline(
-    lambda x: (generate_sparql_queries(x[0], x[1]), x[1]),
-    lambda x: (wikidata_api_calls(x[0]), x[1]),
-    lambda x: generate_final_response(x[0], x[1]),
-)
-
-
-@bot.message_handler(content_types=["location"])
-def handle_location(message):
-    """Handle location messages"""
-    chat_id = message.chat.id
-    lat, lon = message.location.latitude, message.location.longitude
-
-    # Create location message
-    location_msg = ell.user(f"Location shared: {lat}, {lon}")
-    redis_manager.add_message(chat_id, location_msg)
-
-    # Get message history
-    history = redis_manager.get_history(chat_id)
-
-    # Process through pipeline
-    response = wikidata_pipeline(([lat, lon], history))
-
-    # Store bot response
-    bot_response = ell.system(response)
-    redis_manager.add_message(chat_id, bot_response)
-
-    bot.send_message(chat_id, response)
 
 
 @bot.message_handler(func=lambda message: True)
